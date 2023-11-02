@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom Chat to SRT Converter</title>
+</head>
+<body>
+
+<textarea id="zoomChat" rows="10" cols="50" placeholder="Paste Zoom chat here..."></textarea><br><br>
+
+<button onclick="window.convertToSRT()">Convert to SRT</button><br><br>
+
+<textarea id="srtOutput" rows="10" cols="50" placeholder="SRT output will appear here..."></textarea><br><br>
+
+<button onclick="window.saveSRT()">Download SRT</button>
+
+<script>
+  function addSeconds(timeString, secondsToAdd) {
+    // Create a new Date object
+    const date = new Date(`1970-01-01T${timeString}.000Z`);
+    
+    // Add 2 seconds (2000 milliseconds)
+    date.setSeconds(date.getSeconds() + secondsToAdd);
+    
+    // Format the Date object back to a string
+    const hh = String(date.getUTCHours()).padStart(2, '0');
+    const mm = String(date.getUTCMinutes()).padStart(2, '0');
+    const ss = String(date.getUTCSeconds()).padStart(2, '0');
+    
+    return `${hh}:${mm}:${ss}`;
+  }
+  
+  function convertToSRT() {
+    const zoomChatText = document.getElementById('zoomChat').value;
+    const messages = zoomChatText.split('\n').filter(line => line.trim() !== '');
+    const parsedMessages = messages.map((message, index) => {
+      const [time, name, text] = message.split('\t');
+      //const [name, text] = nameAndText.split(':');
+      return { index: index + 1, time, name, text };
+    });
+      
+    console.log({parsedMessages});
+
+    const srtData = parsedMessages.map(message => {
+      const { index, time, name, text } = message;
+      const startTime = time.replace(/\./g, ',');  // replace '.' with ',' for SRT format
+      const endTime = time.replace(/\./g, ',').replace(/(\d{2}):(\d{2}):(\d{2})/, (match, hour, minute, second) => {
+        return addSeconds(hour + ':' + minute + ':' + second, 2);
+      });
+      return `${index}\n${startTime},000 --> ${endTime},000\n${name} ${text}\n`;
+    }).join('\n');
+
+    document.getElementById('srtOutput').value = srtData;
+  }
+
+  function saveSRT() {
+    const srtData = document.getElementById('srtOutput').value;
+    const blob = new Blob([srtData], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'output.srt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>

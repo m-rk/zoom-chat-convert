@@ -7,11 +7,11 @@
 </head>
 <body>
 
-<textarea id="zoomChat" rows="10" cols="50" placeholder="Paste Zoom chat here..."></textarea><br><br>
+<textarea id="zoomChat" rows="10" style="width: 100%;" placeholder="Paste Zoom chat here..."></textarea><br><br>
 
 <button onclick="window.convertToSRT()">Convert to SRT</button><br><br>
 
-<textarea id="srtOutput" rows="10" cols="50" placeholder="SRT output will appear here..."></textarea><br><br>
+<textarea id="srtOutput" rows="10" style="width: 100%;" placeholder="SRT output will appear here..."></textarea><br><br>
 
 <button onclick="window.saveSRT()">Download SRT</button>
 
@@ -46,7 +46,7 @@
       const { index, time, name, text } = message;
       const startTime = time.replace(/\./g, ',');  // replace '.' with ',' for SRT format
       const endTime = time.replace(/\./g, ',').replace(/(\d{2}):(\d{2}):(\d{2})/, (match, hour, minute, second) => {
-        return addSeconds(hour + ':' + minute + ':' + second, 2);
+        return addSeconds(hour + ':' + minute + ':' + second, 10);
       });
       return `${index}\n${startTime},000 --> ${endTime},000\n${name} ${text}\n`;
     }).join('\n');
